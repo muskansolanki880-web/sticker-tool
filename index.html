@@ -1,55 +1,51 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Sticker Maker</title>
-  <style>
-    body { text-align: center; font-family: Arial; }
-    canvas { border: 2px solid black; margin-top: 10px; }
-  </style>
+  <title>AI Sticker Generator PRO</title>
 </head>
-<body>
+<body style="text-align:center; font-family:Arial; background:#111; color:white;">
 
-<h2>🔥 Sticker Maker Tool</h2>
+<h2>🔥 AI Sticker Generator</h2>
 
-<input type="file" id="upload"><br><br>
-<input type="text" id="text" placeholder="Enter text"><br><br>
-<button onclick="addText()">Add Text</button>
-<button onclick="download()">Download PNG</button>
+<input type="text" id="prompt" placeholder="Enter sticker idea"><br><br>
+
+<button onclick="generate()">Generate</button>
+<button onclick="download()">Download</button>
 
 <br><br>
-<canvas id="canvas" width="300" height="300"></canvas>
+<p id="loading"></p>
+<img id="output" width="300">
 
 <script>
-let canvas = document.getElementById("canvas");
-let ctx = canvas.getContext("2d");
+const API_KEY = "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"; // 
 
-document.getElementById("upload").addEventListener("change", function(e) {
-  let file = e.target.files[0];
-  let reader = new FileReader();
+async function generate() {
+  let prompt = document.getElementById("prompt").value + ", sticker, bold outline, transparent background";
 
-  reader.onload = function(event) {
-    let img = new Image();
-    img.onload = function() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(img, 0, 0, 300, 300);
-    }
-    img.src = event.target.result;
-  }
-  reader.readAsDataURL(file);
-});
+  document.getElementById("loading").innerText = "⏳ Generating...";
 
-function addText() {
-  let text = document.getElementById("text").value;
-  ctx.font = "20px Arial";
-  ctx.fillStyle = "red";
-  ctx.fillText(text, 50, 150);
+  let res = await fetch("https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0", {
+    method: "POST",
+    headers: {
+      "Authorization": "Bearer " + API_KEY,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ inputs: prompt })
+  });
+
+  let blob = await res.blob();
+  let url = URL.createObjectURL(blob);
+
+  document.getElementById("output").src = url;
+  document.getElementById("loading").innerText = "";
 }
 
 function download() {
-  let link = document.createElement("a");
-  link.download = "sticker.png";
-  link.href = canvas.toDataURL();
-  link.click();
+  let img = document.getElementById("output");
+  let a = document.createElement("a");
+  a.href = img.src;
+  a.download = "sticker.png";
+  a.click();
 }
 </script>
 
