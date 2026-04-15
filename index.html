@@ -53,29 +53,32 @@
 <img id="output">
 
 <script>
-async function generate() {
-  let userPrompt = document.getElementById("prompt").value;
-  let style = document.getElementById("style").value;
+async function generate() async function generate() {
+  let prompt = document.getElementById("prompt").value + ", sticker, bold outline, transparent background";
 
-  let finalPrompt = userPrompt + ", " + style + ", transparent background, high quality png";
+  document.getElementById("loading").innerText = "⏳ Generating...";
 
-  document.getElementById("loader").style.display = "block";
-
-  let res = await fetch("https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2", {
+  let res = await fetch("https://api-inference.huggingface.co/models/runwayml/stable-diffusion-v1-5", {
     method: "POST",
     headers: {
-      "Authorization": "Bearer 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",
+      "Authorization": "Bearer " + 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,
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({ inputs: finalPrompt })
+    body: JSON.stringify({ inputs: prompt })
   });
+
+  if (!res.ok) {
+    alert("Error: " + res.status);
+    return;
+  }
 
   let blob = await res.blob();
   let url = URL.createObjectURL(blob);
 
   document.getElementById("output").src = url;
-  document.getElementById("loader").style.display = "none";
+  document.getElementById("loading").innerText = "";
 }
+  
 
 function download() {
   let img = document.getElementById("output");
