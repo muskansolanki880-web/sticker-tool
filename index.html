@@ -1,43 +1,80 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>AI Sticker Generator PRO</title>
+  <title>🔥 Pro AI Sticker Generator</title>
+  <style>
+    body {
+      text-align:center;
+      font-family:Arial;
+      background:#111;
+      color:white;
+    }
+    input, select {
+      padding:10px;
+      margin:10px;
+      width:250px;
+    }
+    button {
+      padding:10px 20px;
+      background:#ff4d4d;
+      color:white;
+      border:none;
+      cursor:pointer;
+    }
+    img {
+      margin-top:20px;
+      max-width:300px;
+      border-radius:10px;
+    }
+    #loader {
+      display:none;
+      margin-top:20px;
+    }
+  </style>
 </head>
-<body style="text-align:center; font-family:Arial; background:#111; color:white;">
+<body>
 
-<h2>🔥 AI Sticker Generator</h2>
+<h2>🔥 AI Sticker Generator PRO</h2>
 
-<input type="text" id="prompt" placeholder="Enter sticker idea"><br><br>
+<input type="text" id="prompt" placeholder="Enter sticker idea"><br>
+
+<select id="style">
+  <option value="cute cartoon sticker, bold outline">Cute</option>
+  <option value="anime style sticker, vibrant colors">Anime</option>
+  <option value="gym motivational sticker, strong bold text">Gym</option>
+</select><br>
 
 <button onclick="generate()">Generate</button>
 <button onclick="download()">Download</button>
 
-<br><br>
-<p id="loading"></p>
-<img id="output" width="300">
+<div id="loader">⏳ Generating...</div>
+
+<br>
+<img id="output">
 
 <script>
-const API_KEY = "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"; // 
-
 async function generate() {
-  let prompt = document.getElementById("prompt").value + ", sticker, bold outline, transparent background";
+  let userPrompt = document.getElementById("prompt").value;
+  let style = document.getElementById("style").value;
 
-  document.getElementById("loading").innerText = "⏳ Generating...";
+  let finalPrompt = userPrompt + ", " + style + ", transparent background, high quality png";
 
-  let res = await fetch("https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0", {
+  document.getElementById("loader").style.display = "block";
+
+  let res = await fetch("https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2", {
     method: "POST",
     headers: {
-      "Authorization": "Bearer " + API_KEY,
+      "Authorization": "Bearer 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",
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({ inputs: prompt })
+    body: JSON.stringify({ inputs: finalPrompt })
   });
 
   let blob = await res.blob();
   let url = URL.createObjectURL(blob);
 
   document.getElementById("output").src = url;
-  document.getElementById("loading").innerText = "";
+  document.getElementById("loader").style.display = "none";
 }
 
 function download() {
